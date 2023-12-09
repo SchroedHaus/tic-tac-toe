@@ -5,11 +5,13 @@ let gameboard = {
 };
 
 const playerOne = {
+    name: "Player X",
     marker: "X",
     status: "active"
 };
 
 const playerTwo = {
+    name: "Player O",
     marker: "O",
     status: "inactive"
 };
@@ -24,18 +26,21 @@ function checkWinner(player) {
     const rows = ['row1', 'row2', 'row3'];
     const cols = ['col1', 'col2', 'col3'];
 
+    // Check if there are any completed rows
     for (const row of rows) {
         if (cols.every(col => gameboard[row][col] === player.marker)) {
             return true;
         }
     }
 
+    // Check if there are any completed columns
     for (const col of cols) {
         if (rows.every(row => gameboard[row][col] === player.marker)) {
             return true;
         }
     }
 
+    // Check if there are completed diagonals
     if (cols.every((col, index) => gameboard[rows[index]][col] === player.marker)) {
         return true;
     }
@@ -52,48 +57,83 @@ function isTie() {
 }
 
 function game() {
+
+    let currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
+
+    document.querySelector('.player-heading').innerHTML = currentPlayer.name;
+
+    const squares = document.querySelectorAll('.square');
+
+    squares.forEach(square => {square.addEventListener('click', markIt)});
+};
+
+function markIt(event) {
+    let currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
+
+    event.target.innerHTML = currentPlayer.marker;
+    event.target.removeEventListener('click', markIt);
+
+    let row = event.target.className;
+    row = row.split(' ');
+    row = row[1];
+
+    let col = event.target.className;
+    col = col.split(' ');
+    col = col[2];
+
+    console.log(row, col);
+
+    gameboard[row][col] = currentPlayer.marker;
+
     displayBoard();
 
-    const currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
-
-    let isValidMove = false;
-
-    while (!isValidMove) {
-        const rChoice = prompt(`${currentPlayer.marker}, enter a row (1-3): `);
-        const cChoice = prompt(`${currentPlayer.marker}, enter a column (1-3): `);
-
-        if (
-            rChoice >= 1 &&
-            rChoice <= 3 &&
-            cChoice >= 1 &&
-            cChoice <= 3 &&
-            gameboard[`row${rChoice}`][`col${cChoice}`] === ""
-        ) {
-            gameboard[`row${rChoice}`][`col${cChoice}`] = currentPlayer.marker;
-            isValidMove = true;
-        } else {
-            alert("Invalid move. Try again.");
-        }
-    }
-
     if (checkWinner(currentPlayer)) {
-        console.log(`Winner is ${currentPlayer.marker}!`);
-        return currentPlayer.marker;
-    } else if (isTie()) {
-        console.log("Tie Game!");
-        return "Tie";
+        removeListeners();
+        document.querySelector('.overlay').style.display = 'block';
+        document.querySelector('.result').innerHTML = `Winner is ${currentPlayer.name}!`;
+        document.querySelector('.newGameButton').addEventListener('click', reset);
+        return
     }
-
+    else if (isTie()) {
+        removeListeners();
+        document.querySelector('.overlay').style.display = 'block';
+        document.querySelector('.result').innerHTML = 'Tie Game!';
+        return
+    };
+    
     playerOne.status = playerOne.status === "active" ? "inactive" : "active";
     playerTwo.status = playerTwo.status === "active" ? "inactive" : "active";
 
-    return null;
+    currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
+    
+    document.querySelector('.player-heading').innerHTML = currentPlayer.name;
 }
 
-let winner;
+function reset() {
+    document.querySelector('.overlay').style.display = 'none';
+    playerOne.status = 'active';
+    playerTwo.status = 'inactive'; 
 
-while (!winner) {
-    winner = game();
+    const squares = document.querySelectorAll('.square');
+
+    squares.forEach(square => {square.innerHTML = ""});
+
+    gameboard = {
+    row1: { col1: "", col2: "", col3: "" },
+    row2: { col1: "", col2: "", col3: "" },
+    row3: { col1: "", col2: "", col3: "" },
+    };
+
+    game();
 }
 
-console.log("Game over!");
+function removeListeners() {
+    const squares = document.querySelectorAll('.square');
+    squares.forEach(square => {square.removeEventListener('click', markIt)});
+}
+
+const resetButton = document.querySelector('.resetButton');
+
+resetButton.addEventListener('click', reset);
+
+game();

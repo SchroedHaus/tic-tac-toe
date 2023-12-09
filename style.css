@@ -1,0 +1,153 @@
+:root {
+    --black: rgb(59, 59, 59);
+}
+
+body {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.container {
+    display: grid;
+    justify-items: center;
+}
+
+.gameboard {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px;
+    justify-content: center;
+    margin: 30px;
+}
+
+.square {
+    display: grid;
+    border: 1px solid black;
+    font-size: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+.row1.col1 {
+    border-left: none;
+    border-top: none;
+}
+
+.row1.col2 {
+    border-top: none;
+}
+
+.row1.col3 {
+    border-top: none;
+    border-right: none;
+}
+
+.row2.col1 {
+    border-left: none;
+}
+
+.row2.col3 {
+    border-right: none;
+}
+
+.row3.col1 {
+    border-left: none;
+    border-bottom: none;
+}
+
+.row3.col2 {
+    border-bottom: none;
+}
+
+.row3.col3 {
+    border-bottom: none;
+    border-right: none;
+}
+
+.header {
+    font-size: 60px;
+    background: var(--black);
+    color: whitesmoke;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 20px;
+}
+
+.fadeaway {
+    animation: fadeInOut 1s linear forwards;
+}
+
+@keyframes fadeInOut {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+.resetButton {
+    background: white;
+    width: 200px;
+    text-align: center;
+    color: var(--black);
+    border: 1px solid var(--black);
+    padding: 10px 0;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin: 10px;
+}
+
+.player-heading {
+    font-size: 40px;
+    text-transform: uppercase;
+    padding: 20px;
+}
+
+.overlay {
+    position: fixed;
+    /* Sit on top of the page content */
+    display: none;
+    /* Hidden by default */
+    width: 100%;
+    /* Full width (cover the whole page) */
+    height: 100%;
+    /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.651);
+    /* Black background with opacity */
+    z-index: 2;
+    /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer;
+    /* Add a pointer on hover */
+}
+
+.result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 30px;
+    text-align: center;
+    color: white;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.newGameButton {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    font-size: 30px;
+    text-align: center;
+    color: white;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+
+    background: white;
+    width: 200px;
+    text-align: center;
+    color: var(--black);
+    border: 1px solid var(--black);
+    padding: 10px 0;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin: 10px;
+}
