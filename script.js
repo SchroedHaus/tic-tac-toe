@@ -1,26 +1,201 @@
-let gameboard = {
+const X_SubmitBtn = document.querySelector('.submitButtonX');
+const O_SubmitBtn = document.querySelector('.submitButtonO');
+const startGroup = document.querySelector('.startGroup');
+const playerXNameInput = document.querySelector('.playerXNameInput');
+const playerONameInput = document.querySelector('.playerONameInput');
+
+playerXNameInput.focus();
+
+let playerX = {};
+let playerO = {};
+
+const gameContainer = document.querySelector('.gameContainer')
+const gameboard = document.querySelector('.gameboard');
+
+let moves = {
     row1: { col1: "", col2: "", col3: "" },
     row2: { col1: "", col2: "", col3: "" },
     row3: { col1: "", col2: "", col3: "" },
 };
 
-const playerOne = {
-    name: "Player X",
-    marker: "X",
-    status: "active"
+let players = [];
+
+X_SubmitBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+
+    input = document.querySelector('.playerXNameInput').value;
+
+    if(!input) {
+        document.querySelector('.alert').textContent = 'Enter a name first!';
+    }
+    else {
+        playerX.name = input;
+        playerX.marker = 'X';
+
+        players.push(playerX);
+
+        const playerXForm = document.querySelector('.playerXForm');
+        const playerOForm = document.querySelector('.playerOForm');
+
+        playerXForm.classList.add('slide-out');
+        playerOForm.classList.add('slide-in');
+        
+
+        setTimeout(() => {
+            playerXForm.style.display = 'none';
+                    }, 300);
+
+        setTimeout(() => {
+            playerOForm.style.display = 'grid';
+
+            setTimeout(() => {
+                playerONameInput.focus();
+            }, 500);
+
+        }, 300);
+
+        
+    } 
+})
+
+
+
+O_SubmitBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+
+    input = document.querySelector('.playerONameInput').value;
+
+    if(!input) {
+        document.querySelector('.alert').textContent = 'Enter a name first!';
+    }
+    else {
+        playerO.name = input;
+        playerO.marker = 'O';
+
+        players.push(playerO);
+
+        const playerOForm = document.querySelector('.playerOForm');
+        const startGroup = document.querySelector('.startGroup');
+
+        playerOForm.classList.remove('slide-in');
+        playerOForm.classList.add('slide-out');
+        startGroup.classList.add('slide-in');
+
+        setTimeout(() => {
+            playerOForm.style.display = 'none';
+        }, 300);
+
+        setTimeout(() => {
+            startGroup.style.display = 'grid';
+        }, 300);
+
+        document.querySelector('.players').innerHTML = `Player X is ${playerX.name}<br>
+        Player O is ${playerO.name}`;
+
+        const startBtn = document.querySelector('.startButton');
+
+        startBtn.addEventListener('click', handleStart);
+        document.addEventListener('keydown', function(event) {
+            if(event.key === 'Enter') {
+                handleStart(event);
+            }
+        });
+    }
+})
+
+function handleStart(event) {
+    event.preventDefault();
+
+    document.removeEventListener('keydown', handleStart);
+
+    startGroup.classList.remove('slide-in');
+    startGroup.classList.add('slide-out');
+    gameContainer.classList.add('slide-in');
+
+
+    setTimeout(() => {
+        startGroup.style.display = 'none';
+    }, 300);
+
+    setTimeout(() => {
+        gameContainer.style.display = 'block';
+    }, 300);
+
+    game();
 };
 
-const playerTwo = {
-    name: "Player O",
-    marker: "O",
-    status: "inactive"
-};
+function game() {
+    let currentPlayer = playerX;
+    let inactivePlayer = playerO;
+    let placeholder = "";
+    const turn = document.querySelector('.turn');
 
-function displayBoard() {
-    console.log(gameboard.row1);
-    console.log(gameboard.row2);
-    console.log(gameboard.row3);
-}
+    turn.textContent = `${currentPlayer.name}`;
+
+    const squares = document.querySelectorAll('.square');
+
+    squares.forEach(square => {
+        square.addEventListener('click', squareClickHandler);
+        square.addEventListener('mouseover', squareMouseOverHandler);
+        square.addEventListener('mouseout', squareMouseOutHandler);
+    })
+
+    function squareClickHandler(event) {
+        let row = event.target.classList[1];
+        let col = event.target.classList[2];
+
+        moves[row][col] = currentPlayer.marker;
+
+        event.target.textContent = moves[row][col];
+
+        event.target.classList.add('disabled');
+
+        event.target.removeEventListener('click', squareClickHandler);
+        event.target.removeEventListener('mouseover', squareMouseOverHandler);
+        event.target.removeEventListener('mouseout', squareMouseOutHandler);
+
+        if (checkWinner(currentPlayer)) {
+            turn.innerHTML = `${currentPlayer.name} wins!<br>
+            <button class='reset'>NEW GAME</button>`;
+            const resetBtn = document.querySelector('.reset');
+            disableSquares();
+            resetBtn.addEventListener('click', reset);
+            return
+        }
+        else if (isTie()) {
+            turn.innerHTML = `Tie Game!<br>
+            <button class='reset'>NEW GAME</button>`;
+            const resetBtn = document.querySelector('.reset');
+            disableSquares();
+            resetBtn.addEventListener('click', reset);
+            return
+        }
+
+        placeholder = currentPlayer;
+        currentPlayer = inactivePlayer; 
+        inactivePlayer = placeholder;
+
+        turn.textContent = `${currentPlayer.name}`;
+        
+    }
+
+    function squareMouseOverHandler(event) {
+        event.target.textContent = currentPlayer.marker;
+    }
+
+    function squareMouseOutHandler(event) {
+        event.target.textContent = "";
+    }
+
+    function disableSquares() {
+        document.querySelectorAll('.square').forEach(square => {
+            square.removeEventListener('click', squareClickHandler);
+            square.removeEventListener('mouseover', squareMouseOverHandler);
+            square.removeEventListener('mouseout', squareMouseOutHandler);
+
+        })
+    }
+};
 
 function checkWinner(player) {
     const rows = ['row1', 'row2', 'row3'];
@@ -28,24 +203,28 @@ function checkWinner(player) {
 
     // Check if there are any completed rows
     for (const row of rows) {
-        if (cols.every(col => gameboard[row][col] === player.marker)) {
+        if (cols.every(col => moves[row][col] === player.marker)) {
+            markWinningSquares(row);
             return true;
         }
     }
 
     // Check if there are any completed columns
     for (const col of cols) {
-        if (rows.every(row => gameboard[row][col] === player.marker)) {
+        if (rows.every(row => moves[row][col] === player.marker)) {
+            markWinningSquares(col);
             return true;
         }
     }
 
     // Check if there are completed diagonals
-    if (cols.every((col, index) => gameboard[rows[index]][col] === player.marker)) {
+    if (cols.every((col, index) => moves[rows[index]][col] === player.marker)) {
+        markWinningSquares('LRDiagnol');
         return true;
     }
 
-    if (cols.every((col, index) => gameboard[rows[rows.length - 1 - index]][col] === player.marker)) {
+    if (cols.every((col, index) => moves[rows[rows.length - 1 - index]][col] === player.marker)) {
+        markWinningSquares('RLDiagnol');
         return true;
     }
 
@@ -53,87 +232,33 @@ function checkWinner(player) {
 }
 
 function isTie() {
-    return Object.values(gameboard).every(row => Object.values(row).every(cell => cell !== ""));
+    return Object.values(moves).every(row => Object.values(row).every(cell => cell !== ""));
 }
 
-function game() {
+function markWinningSquares(winningSquares) {
+    const line = document.querySelector('.line');
 
-    let currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
+    line.style.display = 'grid';
 
-    document.querySelector('.player-heading').innerHTML = currentPlayer.name;
+    line.classList.add(winningSquares);
 
-    const squares = document.querySelectorAll('.square');
-
-    squares.forEach(square => {square.addEventListener('click', markIt)});
-};
-
-function markIt(event) {
-    let currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
-
-    event.target.innerHTML = currentPlayer.marker;
-    event.target.removeEventListener('click', markIt);
-
-    let row = event.target.className;
-    row = row.split(' ');
-    row = row[1];
-
-    let col = event.target.className;
-    col = col.split(' ');
-    col = col[2];
-
-    console.log(row, col);
-
-    gameboard[row][col] = currentPlayer.marker;
-
-    displayBoard();
-
-    if (checkWinner(currentPlayer)) {
-        removeListeners();
-        document.querySelector('.overlay').style.display = 'block';
-        document.querySelector('.result').innerHTML = `Winner is ${currentPlayer.name}!`;
-        document.querySelector('.newGameButton').addEventListener('click', reset);
-        return
-    }
-    else if (isTie()) {
-        removeListeners();
-        document.querySelector('.overlay').style.display = 'block';
-        document.querySelector('.result').innerHTML = 'Tie Game!';
-        return
-    };
-    
-    playerOne.status = playerOne.status === "active" ? "inactive" : "active";
-    playerTwo.status = playerTwo.status === "active" ? "inactive" : "active";
-
-    currentPlayer = playerOne.status === "active" ? playerOne : playerTwo;
-    
-    document.querySelector('.player-heading').innerHTML = currentPlayer.name;
+    console.log(winningSquares);
 }
 
 function reset() {
-    document.querySelector('.overlay').style.display = 'none';
-    playerOne.status = 'active';
-    playerTwo.status = 'inactive'; 
-
-    const squares = document.querySelectorAll('.square');
-
-    squares.forEach(square => {square.innerHTML = ""});
-
-    gameboard = {
-    row1: { col1: "", col2: "", col3: "" },
-    row2: { col1: "", col2: "", col3: "" },
-    row3: { col1: "", col2: "", col3: "" },
+    moves = {
+        row1: { col1: "", col2: "", col3: "" },
+        row2: { col1: "", col2: "", col3: "" },
+        row3: { col1: "", col2: "", col3: "" },
     };
+
+    document.querySelector('.line').style.display = 'none';
+    document.querySelector('.line').classList = ['line'];
+    document.querySelectorAll('.square').forEach(square => {
+        square.textContent = "";
+        square.classList.remove('disabled');
+    });
 
     game();
 }
 
-function removeListeners() {
-    const squares = document.querySelectorAll('.square');
-    squares.forEach(square => {square.removeEventListener('click', markIt)});
-}
-
-const resetButton = document.querySelector('.resetButton');
-
-resetButton.addEventListener('click', reset);
-
-game();

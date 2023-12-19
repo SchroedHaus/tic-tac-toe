@@ -3,32 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
+    <title>Document</title>
     <link rel="stylesheet" href="minimize.css">
     <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="header">Tic-Tac-Toe</div>
+    <div class="nav">Tic Tac Toe</div>
     <div class="container">
-        <div class="overlay">
-            <div class="result">Nothing Yet</div>
-            <div class="newGameButton">New Game</div>
-        </div>
         
-        <div class="player-heading">GET READY</div>
-        <div class="gameboard">
-            <div class="square row1 col1"></div>
-            <div class="square row1 col2"></div>
-            <div class="square row1 col3"></div>
-            <div class="square row2 col1"></div>
-            <div class="square row2 col2"></div>
-            <div class="square row2 col3"></div>
-            <div class="square row3 col1"></div>
-            <div class="square row3 col2"></div>
-            <div class="square row3 col3"></div>
+        <form class="playerXForm form">
+            <input class="playerXNameInput input" type="text" id="playerXNameInput" placeholder="Player X Name">
+            <input class="submitButtonX submitButton" type="submit">
+        </form>
+        <form class="playerOForm form">
+            <input class="playerONameInput input" type="text" id="playerONameInput" placeholder="Player O Name">
+            <input class="submitButtonO submitButton" type="submit">
+        </form>
+        <div class="startGroup">
+            <div class="players"></div>
+            <button class="startButton" type="submit" tabindex="0">Start</button>
         </div>
-        <div class="resetButton">Reset</div>
+        <div class="gameContainer">
+            
+            <div class="gameboard">
+                <div class="square row1 col1"></div>
+                <div class="square row1 col2"></div>
+                <div class="square row1 col3"></div>
+                <div class="square row2 col1"></div>
+                <div class="square row2 col2"></div>
+                <div class="square row2 col3"></div>
+                <div class="square row3 col1"></div>
+                <div class="square row3 col2"></div>
+                <div class="square row3 col3"></div>
+                <div class="line"></div>
+            </div>
+            <div class="turn"></div>
+        </div>
     </div>
-    <script type="module" src="script.js"></script>
+    
 </body>
 </html>
